@@ -1,20 +1,65 @@
 import requests
 import pandas as pd
+import os
 from datetime import datetime
+from scripts.send_sms_textbelt import send_sms_alert
+from dotenv import load_dotenv
+load_dotenv()
 
 
-# Fetch data
+# ======= Step 1: Fetch Data =======
 response = requests.get("https://open.er-api.com/v6/latest/USD")
 data = response.json()
 
-
-# Convert JSON to DataFrame
+# ======= Step 2: Convert JSON to DataFrame =======
 rates = data["rates"]
 date = data["time_last_update_utc"]
 rows = [{"date": date, "base": "USD", "target": k, "rate": v} for k, v in rates.items()]
 df = pd.DataFrame(rows)
 df["date"] = pd.to_datetime(df["date"])
 
-# Resolve final file path and save
-df.to_csv("J:/Projects/currency_pipeline_project_real_api/currency_pipeline_project/data/raw/exchanged_rates.csv", index=False)
-print("✅ Fetched and saved real exchange rate data.")
+
+
+# Create output directory if it doesn't exist
+output_dir = os.path.join("data", "raw")
+os.makedirs(output_dir, exist_ok=True)
+
+# Save CSV using relative path
+output_path = os.path.join(output_dir, "exchange_rates.csv")
+df.to_csv(output_path, index=False)
+
+print(f"✅ Fetched and saved real exchange rate data at {output_path}")
+
+# ======= Step 4: Threshold Check =======
+ALERT_THRESHOLD = {
+    "INR": 85.0,
+    "EUR": 0.90,
+    "JPY": 150.0
+}
+
+def check_thresholds(df):
+    alerts = []
+    for currency, threshold in ALERT_THRESHOLD.items():
+        row = df[df["target"] == currency]
+        if not row.empty:
+            rate = float(row["rate"].values[0])
+            if rate < threshold:
+                alerts.append(f"🚨 USD to {currency} is {rate:.2f} (below {threshold})")
+    return alerts
+
+# ======= Step 5: Send Alert if Needed =======
+alerts = check_thresholds(df)
+
+
+# after checking thresholds
+
+
+dry_run = os.getenv("DRY_RUN_SMS", "True").lower() == "true"
+
+if alerts:
+    message = "\n".join(alerts)
+    if dry_run:
+        print("💬 [DRY RUN] SMS alert message that would be sent:")
+        print(message)
+    else:
+        send_sms_alert(message)
