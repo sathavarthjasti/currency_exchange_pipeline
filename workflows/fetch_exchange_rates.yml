@@ -1,35 +1,26 @@
-name: Daily Currency Rate Fetch
+name: Fetch Exchange Rates
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # Runs daily at 7 AM UTC
-  workflow_dispatch:     # Allow manual trigger
+    - cron: "0 0 * * *"  # Runs daily at midnight UTC
+  workflow_dispatch:      # Allow manual trigger
 
 jobs:
-  fetch-and-process:
+  run-pipeline:
     runs-on: ubuntu-latest
+    env:
+      DRY_RUN_SMS: "true"   # ✅ Add this line
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install pandas requests pyarrow
+        run: pip install -r requirements.txt
 
-      - name: Run data fetch script
-        run: |
-          python scripts/fetch_from_api.py
-          python scripts/clean_data.py
-
-      - name: Commit & Push updated files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/*
-          git commit -m "🔁 Daily data update"
-          git push
+      - name: Run pipeline
+        run: python scripts/fetch_from_api.py
