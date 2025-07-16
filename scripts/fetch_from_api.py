@@ -38,7 +38,7 @@ def check_thresholds(df):
     row = df[df["target"] == "INR"]
     if not row.empty:
         rate = float(row["rate"].values[0])
-        if rate < 85.0:
+        if rate < 87.0:
             alerts.append(f"🚨 USD to INR is {rate:.2f} (below 85.0)")
     return alerts
 
