@@ -4,8 +4,8 @@ import os
 from datetime import datetime
 from send_sms_textbelt import send_sms_alert
 from dotenv import load_dotenv
-load_dotenv()
 
+load_dotenv()
 
 # ======= Step 1: Fetch Data =======
 response = requests.get("https://open.er-api.com/v6/latest/USD")
@@ -17,8 +17,6 @@ date = data["time_last_update_utc"]
 rows = [{"date": date, "base": "USD", "target": k, "rate": v} for k, v in rates.items()]
 df = pd.DataFrame(rows)
 df["date"] = pd.to_datetime(df["date"])
-
-
 
 # Create output directory if it doesn't exist
 output_dir = os.path.join("data", "raw")
@@ -49,17 +47,6 @@ def check_thresholds(df):
 
 # ======= Step 5: Send Alert if Needed =======
 alerts = check_thresholds(df)
-
-
-# after checking thresholds
-
-
-dry_run = os.getenv("DRY_RUN_SMS", "True").lower() == "true"
-
 if alerts:
     message = "\n".join(alerts)
-    if dry_run:
-        print("💬 [DRY RUN] SMS alert message that would be sent:")
-        print(message)
-    else:
-        send_sms_alert(message)
+    send_sms_alert(message)  # Let this function decide based on DRY_RUN_SMS

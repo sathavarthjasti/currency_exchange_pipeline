@@ -5,6 +5,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def send_sms_alert(message):
+    dry_run = os.getenv("DRY_RUN_SMS", "false").lower() == "true"
+
+    if dry_run:
+        print("💬 [DRY RUN] SMS alert message that would be sent:")
+        print(message)
+        return
 
     phone = os.getenv("ALERT_PHONE_NUMBER")
     api_key = os.getenv("TEXTBELT_API_KEY")
