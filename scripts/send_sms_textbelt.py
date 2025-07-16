@@ -5,8 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def send_sms_alert(message):
+
     phone = os.getenv("ALERT_PHONE_NUMBER")
-    api_key = os.getenv("TEXTBELT_API_KEY", "textbelt")
+    api_key = os.getenv("TEXTBELT_API_KEY")
 
     response = requests.post("https://textbelt.com/text", {
         'phone': phone,
