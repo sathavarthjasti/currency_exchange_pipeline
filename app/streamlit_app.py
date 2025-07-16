@@ -3,7 +3,8 @@ import pandas as pd
 import altair as alt
 
 # Load Data
-df = pd.read_parquet("data/processed/exchange_rates_clean.parquet")
+df = pd.read_parquet("data/processed/exchanged_rates_clean.parquet")
+
 
 # Sidebar filters
 st.sidebar.title("💱 Currency Filter")
