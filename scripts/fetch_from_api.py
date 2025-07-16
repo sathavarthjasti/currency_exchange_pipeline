@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import os
 from datetime import datetime
-from scripts.send_sms_textbelt import send_sms_alert
+from send_sms_textbelt import send_sms_alert
 from dotenv import load_dotenv
 load_dotenv()
 
