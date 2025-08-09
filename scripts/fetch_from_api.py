@@ -30,7 +30,7 @@ print(f"✅ Fetched and saved real exchange rate data at {output_path}")
 
 # ======= Step 4: Threshold Check =======
 ALERT_THRESHOLD = {
-    "INR": 85.0
+    "INR": 88.0
 }
 
 def check_thresholds(df):
@@ -38,8 +38,8 @@ def check_thresholds(df):
     row = df[df["target"] == "INR"]
     if not row.empty:
         rate = float(row["rate"].values[0])
-        if rate < 85.0:
-            alerts.append(f"🚨 USD to INR is {rate:.2f} (below 85.0)")
+        if rate > 88.0:
+            alerts.append(f"🚨 USD to INR is {rate:.2f} (above 88.0)")
     return alerts
 
 
