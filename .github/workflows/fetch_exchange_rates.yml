@@ -8,6 +8,12 @@ on:
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
+
+    env:
+      TEXTBELT_API_KEY: ${{ secrets.TEXTBELT_API_KEY }}
+      ALERT_PHONE_NUMBER: ${{ secrets.ALERT_PHONE_NUMBER }}
+      DRY_RUN_SMS: ${{ secrets.DRY_RUN_SMS }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
